@@ -1,19 +1,31 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20
-# Set the working directory in the container
+# FROM node:20 
+# WORKDIR /app
+# COPY package*.json .
+# RUN npm install 
+# COPY . .
+# RUN npm run build
+# RUN npm install -g serve
+# EXPOSE 3000
+# CMD ["serve","-s","dist","-l","3000"]
+# ----------- Stage 1: Build -----------
+FROM node:20-alpine AS builder
 WORKDIR /app
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json .
-# Install the dependencies
-RUN npm install 
-# Copy the rest of the application code to the working directory
+# Copy only package files first (better caching)
+COPY package*.json ./
+# Install only dependencies needed for build
+RUN npm install
+# Copy rest of the code
 COPY . .
-# Build the React application
-RUN npm run build 
-# Install serve to serve the built application
+# Build the app
+RUN npm run build
+# ----------- Stage 2: Production -----------
+FROM node:20-alpine
+WORKDIR /app
+# Install lightweight static server
 RUN npm install -g serve
-# Expose the port that the application will run on
+# Copy only build output from builder
+COPY --from=builder /app/dist ./dist
+# Expose port
 EXPOSE 3000
-# Command to run the application
-CMD [ "serve","dist","-s","-l","3000"]
-
+# Run app
+CMD ["serve", "-s", "dist", "-l", "3000"]

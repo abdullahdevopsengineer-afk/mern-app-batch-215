@@ -1,4 +1,4 @@
-const API = "/api/posts";
+const API = `${import.meta.env.VITE_API_URL}/api/posts`;
 
 export async function fetchPosts(search = "", tag = "") {
   const params = new URLSearchParams();
