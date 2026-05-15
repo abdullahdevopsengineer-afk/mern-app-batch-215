@@ -1,0 +1,12 @@
+name: hello docker 
+on:
+  push:
+   branches: 
+    - main
+jobs:
+  hello-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print docker
+        run: echo"Hello docker"
