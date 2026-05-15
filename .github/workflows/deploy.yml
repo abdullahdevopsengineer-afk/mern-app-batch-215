@@ -1,4 +1,4 @@
-name: hello docker
+name: Save File Artifact
 
 on:
   push:
@@ -6,9 +6,21 @@ on:
       - main
 
 jobs:
-  hello-docker:
+  create-artifact:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print docker
-        run: echo "Hello docker"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create a file
+        run: |
+          mkdir output
+          echo "Hello from GitHub Actions" > output/message.txt
+          echo "This file is stored as an artifact." >> output/message.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: output/message.txt
